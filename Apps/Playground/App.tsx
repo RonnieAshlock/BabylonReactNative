@@ -9,7 +9,7 @@ import React, { useState, FunctionComponent, useEffect, useCallback } from 'reac
 import { Button, View, Text, ViewProps, StyleSheet } from 'react-native';
 
 import { EngineView, useEngine } from 'react-native-babylon';
-import { Scene, Vector3, Mesh, AbstractMesh, ArcRotateCamera, Camera, PBRMetallicRoughnessMaterial, Color3, TargetCamera, WebXRSessionManager, WebXRFeaturesManager, WebXRFeatureName, WebXRHitTest, FreeCamera, SceneLoader, PointerEventTypes } from '@babylonjs/core';
+import { DeviceSourceManager, DeviceType, Scene, Vector3, Mesh, AbstractMesh, ArcRotateCamera, Camera, PBRMetallicRoughnessMaterial, Color3, TargetCamera, WebXRSessionManager, WebXRFeaturesManager, WebXRFeatureName, WebXRHitTest, FreeCamera, SceneLoader, PointerEventTypes } from '@babylonjs/core';
 import { NavBar } from "./components/NavBar";
 import { TeachingMoment, TeachingMomentType } from "./components/TeachingMoment";
 import { CameraButton } from "./components/CameraButton";
@@ -22,43 +22,52 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const [scene, setScene] = useState<Scene>();
   const [xrSession, setXrSession] = useState<WebXRSessionManager>();
   const [cameraInitialPosition, setCameraPosition] = useState<Vector3>(Vector3.Zero());
-  const [pointerDown, setPointerDown] = useState(false);
+  const [deviceSourceManager, setDeviceSourceManager] = useState<DeviceSourceManager>();
 
   const createInputHandling = useCallback(() => {
-    /*if (scene !== undefined)
+    try
     {
-      var priorX = scene.pointerX;
-      var priorY = scene.pointerY;
-      var x = 0;
-      var y = 0;
-      scene.onBeforeRenderObservable.add(function () {
-          x = scene.pointerX;
-          y = scene.pointerY;
+    if (engine && scene) {
+      const dsm = new DeviceSourceManager(engine);
+      setDeviceSourceManager(dsm);
+      scene.beforeRender = function() {
+         const sources = dsm.getDeviceSources(DeviceType.Touch);
+         console.error(sources);
+         if (sources !== undefined)
+         {
+           console.error(sources);
+         }
+      }
 
-          if (pointerDown && camera)
-          {
-              console.error (x + " " + y)
-              camera.alpha += 0.01 * (priorX - x);
-              camera.beta += 0.01 * (priorY - y);
-          }
+      dsm.onAfterDeviceConnectedObservable.add(deviceEventData => {
+        /*console.error("Got input device.");
+        setTeachingMomentVisible(false);
 
-          priorX = x;
-          priorY = y;
+        if (xrSession && model && camera && scene) {
+          model.setEnabled(false);
+          model.scalingDeterminant = 0;
+
+          camera.setTarget(model);
+          const startTime = Date.now();
+          scene.beforeRender = function () {
+            if (model.scalingDeterminant < 1) {
+              const newScale = (Date.now() - startTime) / 1000;
+              model.scalingDeterminant = newScale > 1 ? 1: newScale;
+            }
+          };      
+        }*/      
+        console.log(`Added ${DeviceType[deviceEventData.deviceType]}-${deviceEventData.deviceSlot}`);
+        dsm.getDeviceSource(deviceEventData.deviceType, deviceEventData.deviceSlot)?.onInputChangedObservable.add(inputEventData => {
+          console.log(`${DeviceType[deviceEventData.deviceType]}-${deviceEventData.deviceSlot} | ${PointerInput[inputEventData.inputIndex]} | ${inputEventData.previousState} -> ${inputEventData.currentState}`);
+        });
       });
-
-      scene.onPointerObservable.add((pointerInfo) => {
-          switch (pointerInfo.type)
-          {
-              case PointerEventTypes.POINTERDOWN:
-                setPointerDown(true);
-                break;
-              case PointerEventTypes.POINTERUP:
-                setPointerDown(false);
-                break;
-          }
-      });
-    }*/
-  }, [scene, camera]);
+    }
+  }
+  catch (ex)
+  {
+    console.error(ex);
+  }
+  }, [engine, scene, camera, model, xrSession]);
 
   const initializeScene = useCallback(async () => {
     if (engine) {
@@ -69,6 +78,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       setCamera(arcCamera);
       setCameraPosition(arcCamera.position);
       scene.createDefaultLight(true);
+      createInputHandling();
 
       /*try {
         const model = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
@@ -116,6 +126,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         
         newBox.rotate(Vector3.Up(), 0.005 * scene.getAnimationRatio());
       };
+
     }
   }, [engine]);
 
@@ -184,12 +195,14 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         if (model !== undefined && scene !== undefined) {
           if (camera !== undefined)
           {
+            model.setEnabled(true);
             model.position = camera.position.add(camera.getForwardRay().direction);
             camera.position = cameraInitialPosition;
           }
         }
       } else {
         if (model !== undefined && scene !== undefined) {
+          model.setEnabled(false);
           const xr = await scene.createDefaultXRExperienceAsync({ disableDefaultUI: true, disableTeleportation: true })
 
           // Set up the hit test.
@@ -247,4 +260,3 @@ const App = () => {
 };
 
 export default App;
-console.disableYellowBox = true;
