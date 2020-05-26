@@ -40,7 +40,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       }
 
       dsm.onAfterDeviceConnectedObservable.add(deviceEventData => {
-        /*console.error("Got input device.");
+        console.error("Got input device.");
         setTeachingMomentVisible(false);
 
         if (xrSession && model && camera && scene) {
@@ -55,11 +55,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
               model.scalingDeterminant = newScale > 1 ? 1: newScale;
             }
           };      
-        }*/      
-        console.log(`Added ${DeviceType[deviceEventData.deviceType]}-${deviceEventData.deviceSlot}`);
-        dsm.getDeviceSource(deviceEventData.deviceType, deviceEventData.deviceSlot)?.onInputChangedObservable.add(inputEventData => {
-          console.log(`${DeviceType[deviceEventData.deviceType]}-${deviceEventData.deviceSlot} | ${PointerInput[inputEventData.inputIndex]} | ${inputEventData.previousState} -> ${inputEventData.currentState}`);
-        });
+        }
       });
     }
   }
