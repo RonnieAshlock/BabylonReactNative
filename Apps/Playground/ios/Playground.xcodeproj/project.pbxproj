@@ -20,6 +20,15 @@
 		76A5C9314E69F53B9308D45C /* libPods-PlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A27E99BCBBA16817330523FA /* libPods-PlaygroundTests.a */; };
 		BC17671D40F4DD48338295AB /* libPods-Playground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F6BC394028D7BAE8A003F7EF /* libPods-Playground.a */; };
 		DC0E086EEC7F13FF7B7A6ACC /* libPods-Playground-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFE1A6A1208FCAF679B3028D /* libPods-Playground-tvOSTests.a */; };
+		0F2E92E3F53741B6BE0E7FAF /* ArViewerIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9EC467C2B2834445B90CAEE9 /* ArViewerIcons.ttf */; };
+		69B374DC80CA4E469FF05E24 /* segoeui.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 92F25ABE327B41FFB98E67F5 /* segoeui.ttf */; };
+		91CB32A0B3DE4DAD9DBA5DB8 /* segoeuib.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFA0E7200EA94AAB99FAB04B /* segoeuib.ttf */; };
+		582309CAD69240FCA88E38A2 /* segoeuii.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 49E87C25B8234E7CBAC779C2 /* segoeuii.ttf */; };
+		356C87826BCB414390DBF24F /* segoeuil.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 82B05673A97443ABB0930020 /* segoeuil.ttf */; };
+		D1A439B89E5F4DF0AB00A1A2 /* segoeuiz.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5DCDFCCD1BC7472BB27181B2 /* segoeuiz.ttf */; };
+		90ECD009D93E4C6883223AB9 /* seguili.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 57C6170DF0B84594BBBCB76F /* seguili.ttf */; };
+		22FB9D4BD4064384BB74901A /* seguisb.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BC7AFCD5EF254EFF96569A3C /* seguisb.ttf */; };
+		FD00A881557E43AD90D970A6 /* seguisbi.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4F9E9A79F3944CD2B18CFD2E /* seguisbi.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +76,15 @@
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		EFE1A6A1208FCAF679B3028D /* libPods-Playground-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Playground-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6BC394028D7BAE8A003F7EF /* libPods-Playground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Playground.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9EC467C2B2834445B90CAEE9 /* ArViewerIcons.ttf */ = {isa = PBXFileReference; name = "ArViewerIcons.ttf"; path = "../assets/fonts/ArViewerIcons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		92F25ABE327B41FFB98E67F5 /* segoeui.ttf */ = {isa = PBXFileReference; name = "segoeui.ttf"; path = "../assets/fonts/segoeui.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		FFA0E7200EA94AAB99FAB04B /* segoeuib.ttf */ = {isa = PBXFileReference; name = "segoeuib.ttf"; path = "../assets/fonts/segoeuib.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		49E87C25B8234E7CBAC779C2 /* segoeuii.ttf */ = {isa = PBXFileReference; name = "segoeuii.ttf"; path = "../assets/fonts/segoeuii.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		82B05673A97443ABB0930020 /* segoeuil.ttf */ = {isa = PBXFileReference; name = "segoeuil.ttf"; path = "../assets/fonts/segoeuil.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		5DCDFCCD1BC7472BB27181B2 /* segoeuiz.ttf */ = {isa = PBXFileReference; name = "segoeuiz.ttf"; path = "../assets/fonts/segoeuiz.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		57C6170DF0B84594BBBCB76F /* seguili.ttf */ = {isa = PBXFileReference; name = "seguili.ttf"; path = "../assets/fonts/seguili.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		BC7AFCD5EF254EFF96569A3C /* seguisb.ttf */ = {isa = PBXFileReference; name = "seguisb.ttf"; path = "../assets/fonts/seguisb.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		4F9E9A79F3944CD2B18CFD2E /* seguisbi.ttf */ = {isa = PBXFileReference; name = "seguisbi.ttf"; path = "../assets/fonts/seguisbi.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +199,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				6AAE7CC422115225492C3AA8 /* Pods */,
+				D160F2EE3131437E86808336 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -197,6 +216,23 @@
 			);
 			name = Products;
 			sourceTree = "<group>";
+		};
+		D160F2EE3131437E86808336 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				9EC467C2B2834445B90CAEE9 /* ArViewerIcons.ttf */,
+				92F25ABE327B41FFB98E67F5 /* segoeui.ttf */,
+				FFA0E7200EA94AAB99FAB04B /* segoeuib.ttf */,
+				49E87C25B8234E7CBAC779C2 /* segoeuii.ttf */,
+				82B05673A97443ABB0930020 /* segoeuil.ttf */,
+				5DCDFCCD1BC7472BB27181B2 /* segoeuiz.ttf */,
+				57C6170DF0B84594BBBCB76F /* seguili.ttf */,
+				BC7AFCD5EF254EFF96569A3C /* seguisb.ttf */,
+				4F9E9A79F3944CD2B18CFD2E /* seguisbi.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -285,7 +321,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 940;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -338,6 +374,15 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				0F2E92E3F53741B6BE0E7FAF /* ArViewerIcons.ttf in Resources */,
+				69B374DC80CA4E469FF05E24 /* segoeui.ttf in Resources */,
+				91CB32A0B3DE4DAD9DBA5DB8 /* segoeuib.ttf in Resources */,
+				582309CAD69240FCA88E38A2 /* segoeuii.ttf in Resources */,
+				356C87826BCB414390DBF24F /* segoeuil.ttf in Resources */,
+				D1A439B89E5F4DF0AB00A1A2 /* segoeuiz.ttf in Resources */,
+				90ECD009D93E4C6883223AB9 /* seguili.ttf in Resources */,
+				22FB9D4BD4064384BB74901A /* seguisb.ttf in Resources */,
+				FD00A881557E43AD90D970A6 /* seguisbi.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -19,7 +19,7 @@ export const ARViewerTheme: Theme = {
     disabledTextColor: "#767673",
     disabledBorderColor: "#919191",
     whiteColor: "#FFFFFF",
-    fontFamily: "Segoe UI",
-    iconFontFamily: "Fabric MDL2 Assets",
+    fontFamily: "segoeui",
+    iconFontFamily: "ArViewerIcons",
     fontSize: 18
 };

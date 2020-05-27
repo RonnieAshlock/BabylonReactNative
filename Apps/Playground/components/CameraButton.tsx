@@ -45,7 +45,7 @@ export const CameraButton: FunctionComponent<CameraButtonProps> = (props: Camera
         <TouchableOpacity
             onPress={props.cameraClickHandler}
             style={[CircleButtonStyles.button, styles.button]}>
-            <Text style={[IconFontStyle.icon, styles.icon]}>{"\uE722"}</Text>
+            <Text style={[IconFontStyle.icon, styles.icon]}>{"\uE710"}</Text>
         </TouchableOpacity>
     );
 
