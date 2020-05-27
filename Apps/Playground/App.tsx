@@ -6,13 +6,13 @@
  */
 
 import React, { useState, FunctionComponent, useEffect, useCallback, useRef } from 'react';
-import { Button, View, Text, ViewProps, StyleSheet } from 'react-native';
-
+import { View, ViewProps, StyleSheet } from 'react-native';
 import { EngineView, useEngine } from 'react-native-babylon';
-import { DeviceSourceManager, DeviceType, Scene, Vector3, Mesh, AbstractMesh, ArcRotateCamera, Camera, PBRMetallicRoughnessMaterial, Color3, TargetCamera, WebXRSessionManager, WebXRFeaturesManager, WebXRFeatureName, WebXRHitTest, FreeCamera, SceneLoader, PointerEventTypes } from '@babylonjs/core';
+import { DeviceSourceManager, Scene, Vector3, Mesh, AbstractMesh, ArcRotateCamera, WebXRSessionManager, WebXRFeatureName, WebXRHitTest, SceneLoader} from '@babylonjs/core';
 import { NavBar } from "./components/NavBar";
 import { TeachingMoment, TeachingMomentType } from "./components/TeachingMoment";
 import { CameraButton } from "./components/CameraButton";
+import "@babylonjs/loaders/glTF";
 
 const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const engine = useEngine();
@@ -25,20 +25,20 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const cameraInitialPosition = useRef<Vector3>(Vector3.Zero());
   const deviceSourceManager = useRef<DeviceSourceManager>();
   const modelPlaced = useRef(false);
-
+  const [showARControls, setShowARControls] = useState(false);
 
   const placeModel = useCallback(() => {
-    setTeachingMomentVisible(false);
-
-    if (xrSession.current && model.current && camera && scene.current && placementIndicator.current) {
+    try {
+    if (xrSession.current && !modelPlaced.current && placementIndicator.current && model.current && scene.current) {
+      setTeachingMomentVisible(false);
       modelPlaced.current = true;
       placementIndicator.current.setEnabled(false);
       model.current.setEnabled(true);
       model.current.position = placementIndicator.current.position.clone();
-      model.current.position.y += .15;
+      const { min, max } = model.current.getHierarchyBoundingVectors(true, null);
+      model.current.position.y += (max.y - min.y) / 2;
       model.current.scalingDeterminant = 0;
 
-      camera.setTarget(model.current);
       const startTime = Date.now();
       scene.current.beforeRender = function () {
         if (model.current && model.current.scalingDeterminant < 1) {
@@ -47,34 +47,19 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         }
       };      
     }
-  }, [scene.current, camera, model.current, xrSession.current]);
+    } catch (ex) { console.error(ex);}
+  }, [scene.current, camera, model.current, xrSession.current, modelPlaced.current]);
 
   const createInputHandling = useCallback(() => {
-    try
-    {
       if (engine && scene.current) {
         deviceSourceManager.current = new DeviceSourceManager(engine);
-        scene.current.beforeRender = function() {
-          const sources = deviceSourceManager.current?.getDeviceSources(DeviceType.Touch);
-          console.error(sources);
-          if (sources !== undefined)
-          {
-            console.error(sources);
-          }
-        }
-
         deviceSourceManager.current.onAfterDeviceConnectedObservable.add(deviceEventData => {
+          placeModel(); 
         });
     }
-  }
-  catch (ex)
-  {
-    console.error(ex);
-  }
   }, [engine, scene.current, camera, model.current, xrSession.current]);
 
   const initializeScene = useCallback(async () => {
-    try {
     if (engine) {
       scene.current = new Scene(engine);
       scene.current.createDefaultCamera(true);
@@ -84,29 +69,40 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       scene.current.createDefaultLight(true);
       createInputHandling();
 
-      /*try {
-        const model = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
+      placementIndicator.current = Mesh.CreateTorus("placementIndicator", .3, .01, 64);
+      placementIndicator.current.scaling = new Vector3(1, 0.01, 1);
+      placementIndicator.current.setEnabled(false);
+
+     try {
+        const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
         setTeachingMomentVisible(true);
-        model.meshes[0].position = arcCamera.position.add(arcCamera.getForwardRay().direction.scale(5));
-        model.meshes[0].position.y -= 6;
-        model.meshes[0].scalingDeterminant = 1.5;
-        model.meshes[0].rotate(Vector3.Up(), 3.14159);
+        newModel.meshes[0].position = arcRotateCam.position.add(arcRotateCam.getForwardRay().direction.scale(5));
+        newModel.meshes[0].position.y -= 6;
+        newModel.meshes[0].scalingDeterminant = 1.5;
+        newModel.meshes[0].rotate(Vector3.Up(), 3.14159);
 
-        const box = model.meshes[0];
-        setBox(box);
-        arcCamera.setTarget(box);
-        arcCamera.beta -= Math.PI / 8;
+        model.current = newModel.meshes[0];
+        arcRotateCam.setTarget(model.current);
+        arcRotateCam.beta -= Math.PI / 8;
 
-        scene.beforeRender = function () {
-          box.rotate(Vector3.Up(), 0.005 * scene.getAnimationRatio());
-        }
+        const startTime = Date.now();
+        scene.current.beforeRender = function () {
+          if (model.current && scene.current) {
+            if (model.current.scalingDeterminant < 1) {
+              const newScale = (Date.now() - startTime) / 500;
+              model.current.scalingDeterminant = newScale > 1 ? 1: newScale;
+            }
+            
+            model.current.rotate(Vector3.Up(), 0.005 * scene.current.getAnimationRatio());
+          }
+        };
       }
       catch (ex)
       {
         console.error(ex);
-      }*/
+      }
 
-      model.current = Mesh.CreateBox("box", 0.3, scene.current);
+      /*model.current = Mesh.CreateBox("box", 0.3, scene.current);
       model.current.position = arcRotateCam.position.add(arcRotateCam.getForwardRay().direction);
 
       const mat = new PBRMetallicRoughnessMaterial("mat", scene.current);
@@ -116,10 +112,6 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       model.current.material = mat;
 
       model.current.scalingDeterminant = 0;
-
-      placementIndicator.current = Mesh.CreateTorus("placementIndicator", .3, .01, 32);
-      placementIndicator.current.scaling = new Vector3(1, 0.01, 1);
-      placementIndicator.current.setEnabled(false);
 
       arcRotateCam.setTarget(model.current);
       arcRotateCam.beta -= Math.PI / 8;
@@ -134,13 +126,8 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
           
           model.current.rotate(Vector3.Up(), 0.005 * scene.current.getAnimationRatio());
         }
-      };
+      };*/
     }
-  }
-  catch (ex)
-  {
-    console.error(ex);
-  }
   }, [engine]);
 
   useEffect(() => {
@@ -223,9 +210,11 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         xrSession.current = undefined;
         modelPlaced.current = true;
         setTeachingMomentVisible(false);
+        setShowARControls(false);
         reset2D();
       } else {
         if (model.current && scene.current && placementIndicator.current) {
+          setShowARControls(true);
           model.current.setEnabled(false);
           modelPlaced.current = false;
           const xr = await scene.current.createDefaultXRExperienceAsync({ disableDefaultUI: true, disableTeleportation: true })
@@ -271,7 +260,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
                 <TeachingMoment teachingMomentType={TeachingMomentType.tapToPlace} />
             </View>
           }
-          { xrSession.current && 
+          { showARControls && 
             <View style={styles.placementBarContainer}>
               <CameraButton style={styles.cameraButton} cameraClickHandler={placeModel} />
             </View>

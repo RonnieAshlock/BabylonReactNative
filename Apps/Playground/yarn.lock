@@ -690,11 +690,27 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@babylonjs/core@4.2.0-alpha.16":
-  version "4.2.0-alpha.16"
-  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-4.2.0-alpha.16.tgz#a0ec92f647d8e52aacedb605bfcdaa9dc71152ea"
-  integrity sha512-I6WP+u5U99ZtygKanO6wxon0KpYD3qV63oTQx8ZyqlCrQte/F9viB4xyOvb5rSWlZvMeGgcsUV66kJ+9upPihA==
+"@babylonjs/core@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-4.1.0.tgz#63e390862debf81f8cf248496187029c42ea5eda"
+  integrity sha512-4pEKPEu14qRdqH5qatfmns/iHFHmujDI22SXkHIlJhTT0WgJH4I8IN1fPw9sU6jSCH2ul76Lpbi2zREvfrEDQA==
   dependencies:
+    tslib "^1.10.0"
+
+"@babylonjs/core@4.2.0-alpha.17":
+  version "4.2.0-alpha.17"
+  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-4.2.0-alpha.17.tgz#0ce4202e586a15dc46b30f3fe50c28703ef00f31"
+  integrity sha512-0HAosOiAlJlBZaeH8Z6Z21R+vDGSp5boQxyDN9Y5g6l4kXRITvPfU9Zd/jfy8vKpTmkGNBbb5q4R9H55ZufkzA==
+  dependencies:
+    tslib "^1.10.0"
+
+"@babylonjs/loaders@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@babylonjs/loaders/-/loaders-4.1.0.tgz#1b40f8c07b46228ae4cf6dbda2d0856293f4db80"
+  integrity sha512-stK/QygoNhdrJ9q8yNyZ7iE8Eu+dpwBviSoEigLX5IwHFJUmyxeI0LIZpjRAP2GRB96kqLrBsIBdWEwk076w/g==
+  dependencies:
+    "@babylonjs/core" "4.1.0"
+    babylonjs-gltf2interface "4.1.0"
     tslib "^1.10.0"
 
 "@cnakazawa/watch@^1.0.3":
@@ -1616,6 +1632,11 @@ babel-preset-jest@^24.9.0:
   dependencies:
     "@babel/plugin-syntax-object-rest-spread" "^7.0.0"
     babel-plugin-jest-hoist "^24.9.0"
+
+babylonjs-gltf2interface@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/babylonjs-gltf2interface/-/babylonjs-gltf2interface-4.1.0.tgz#95ec994e352ac5cb74869e238218a1b4df18e2f4"
+  integrity sha512-H2obg+4t8bcmLyzGiOQqmUaTQqTu+6mJUlsMWZvmRBf0k2fQVeTdAkH7aDy6HVIz/THvpIx4ntG1Lsyquvmc5Q==
 
 balanced-match@^1.0.0:
   version "1.0.0"

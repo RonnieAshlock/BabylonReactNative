@@ -57,7 +57,7 @@ export const NavBar: FunctionComponent<NavBarProps> = (props: NavBarProps) => {
                 onPress={props.backClickHandler}
                 style={styles.buttonStyle}>
                 <Text style={[IconFontStyle.icon, styles.icon]}>{"\uE722"}</Text>
-                <Text style={styles.buttonText}>{"Toggle XR"}</Text>
+                <Text style={styles.buttonText}>{"Enter/Exit XR"}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
