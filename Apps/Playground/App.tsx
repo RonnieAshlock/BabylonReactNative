@@ -19,10 +19,35 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const [teachingMomentVisible, setTeachingMomentVisible] = useState(false);
   const [camera, setCamera] = useState<ArcRotateCamera>();
   const [model, setModel] = useState<AbstractMesh>();
+  const [placementIndicator, setPlacementIndicator] = useState<AbstractMesh>();
   const [scene, setScene] = useState<Scene>();
   const [xrSession, setXrSession] = useState<WebXRSessionManager>();
   const [cameraInitialPosition, setCameraPosition] = useState<Vector3>(Vector3.Zero());
   const [deviceSourceManager, setDeviceSourceManager] = useState<DeviceSourceManager>();
+  const [modelPlaced, setModelPlaced] = useState(false);
+
+
+  const placeModel = useCallback(() => {
+    setTeachingMomentVisible(false);
+
+    if (xrSession && model && camera && scene && placementIndicator) {
+      setModelPlaced(true);
+      placementIndicator.setEnabled(false);
+      model.setEnabled(true);
+      model.position = placementIndicator.position.clone();
+      model.position.y += .15;
+      model.scalingDeterminant = 0;
+
+      camera.setTarget(model);
+      const startTime = Date.now();
+      scene.beforeRender = function () {
+        if (model.scalingDeterminant < 1) {
+          const newScale = (Date.now() - startTime) / 1000;
+          model.scalingDeterminant = newScale > 1 ? 1: newScale;
+        }
+      };      
+    }
+  }, [scene, camera, model, xrSession]);
 
   const createInputHandling = useCallback(() => {
     try
@@ -40,22 +65,6 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       }
 
       dsm.onAfterDeviceConnectedObservable.add(deviceEventData => {
-        console.error("Got input device.");
-        setTeachingMomentVisible(false);
-
-        if (xrSession && model && camera && scene) {
-          model.setEnabled(false);
-          model.scalingDeterminant = 0;
-
-          camera.setTarget(model);
-          const startTime = Date.now();
-          scene.beforeRender = function () {
-            if (model.scalingDeterminant < 1) {
-              const newScale = (Date.now() - startTime) / 1000;
-              model.scalingDeterminant = newScale > 1 ? 1: newScale;
-            }
-          };      
-        }
       });
     }
   }
@@ -72,7 +81,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       scene.createDefaultCamera(true);
       const arcCamera = scene.activeCamera as ArcRotateCamera;
       setCamera(arcCamera);
-      setCameraPosition(arcCamera.position);
+      setCameraPosition(arcCamera.position.clone());
       scene.createDefaultLight(true);
       createInputHandling();
 
@@ -110,6 +119,11 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
 
       newBox.scalingDeterminant = 0;
 
+      var placementIndicator = Mesh.CreateTorus("placementIndicator", .3, .01, 32);
+      placementIndicator.scaling = new Vector3(1, 0.01, 1);
+      placementIndicator.setEnabled(false);
+      setPlacementIndicator(placementIndicator);
+
       arcCamera.setTarget(newBox);
       arcCamera.beta -= Math.PI / 8;
 
@@ -132,10 +146,10 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       }
   }, [engine]);
 
-  const resetClick = useCallback(() => {
-    setTeachingMomentVisible(false);
-    Date.now()
-    if (model !== undefined && camera !== undefined && scene !== undefined) {
+  const reset2D = useCallback( () =>{
+    if (model && camera && scene) {
+      model.setEnabled(true);
+      placementIndicator?.setEnabled(false);
       model.position = camera.position.add(camera.getForwardRay().direction);
 
       model.scalingDeterminant = 0;
@@ -149,9 +163,24 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         }
 
         model.rotate(Vector3.Up(), 0.005 * scene.getAnimationRatio());
-      };
+      }; 
     }
-  }, [model, scene, xrSession]);
+  }, [model, camera, scene]);
+
+  const resetClick = useCallback(() => {
+    setTeachingMomentVisible(false);
+    if (model !== undefined && camera !== undefined && scene !== undefined && placementIndicator) {
+      if (xrSession)
+      {
+        model.setEnabled(false);
+        placementIndicator.setEnabled(true);
+      }
+      else
+      {
+        reset2D();
+      }
+    }
+  }, [model, camera, scene, xrSession]);
 
   const styles = StyleSheet.create({
     arView: {
@@ -191,14 +220,13 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         if (model !== undefined && scene !== undefined) {
           if (camera !== undefined)
           {
-            model.setEnabled(true);
-            model.position = camera.position.add(camera.getForwardRay().direction);
-            camera.position = cameraInitialPosition;
+            reset2D();
           }
         }
       } else {
-        if (model !== undefined && scene !== undefined) {
+        if (model !== undefined && scene !== undefined && placementIndicator) {
           model.setEnabled(false);
+          var enabledPlacementIndicator = false;
           const xr = await scene.createDefaultXRExperienceAsync({ disableDefaultUI: true, disableTeleportation: true })
 
           // Set up the hit test.
@@ -207,14 +235,19 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
             "latest",
              {offsetRay: {origin: {x: 0, y: 0, z: 0}, direction: {x: 0, y: 0, z: -1}}}) as WebXRHitTest;
 
-          xrHitTestModule.onHitTestResultObservable.add((results) => {
+            xrHitTestModule.onHitTestResultObservable.add((results) => {
               if (results.length) {
-                if (!teachingMomentVisible)
+                if (!teachingMomentVisible && placementIndicator.isEnabled())
                 {
                   setTeachingMomentVisible(true);
                 }
+                else if (!enabledPlacementIndicator)
+                {
+                  enabledPlacementIndicator = true;
+                  placementIndicator.setEnabled(true);
+                }
 
-                model.position = results[0].position;
+                placementIndicator.position = results[0].position;
               }
           });
 
@@ -239,7 +272,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
           }
 
           <View style={styles.placementBarContainer}>
-                  <CameraButton style={styles.cameraButton} cameraClickHandler={() => {}} />
+                  <CameraButton style={styles.cameraButton} cameraClickHandler={placeModel} />
           </View>
         </View>
       </View>
