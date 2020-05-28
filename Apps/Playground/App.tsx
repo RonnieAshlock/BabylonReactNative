@@ -12,7 +12,7 @@ import { DeviceSourceManager, DeviceType, PointerInput, PBRMetallicRoughnessMate
 import { NavBar } from "./components/NavBar";
 import { TeachingMoment, TeachingMomentType } from "./components/TeachingMoment";
 import { CameraButton } from "./components/CameraButton";
-import "@babylonjs/loaders/glTF";
+import "@babylonjs/loaders";
 
 const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const engine = useEngine();
@@ -27,6 +27,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const modelPlaced = useRef(false);
   const [showARControls, setShowARControls] = useState(false);
   const targetScale = useRef(.25);
+  const numInputs = useRef(0);
 
   useEffect(() => {
     if (engine) {
@@ -44,12 +45,13 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       scene.current.createDefaultLight(true);
       createInputHandling();
 
-      placementIndicator.current = Mesh.CreateTorus("placementIndicator", .3, .01, 64);
+      placementIndicator.current = Mesh.CreateTorus("placementIndicator", .3, .005, 64);
       placementIndicator.current.scaling = new Vector3(1, 0.01, 1);
       placementIndicator.current.setEnabled(false);
 
       try {
-      const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF/BoxAnimated.gltf");
+      const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
+      //const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF/BoxAnimated.gltf");
       model.current = newModel.meshes[0];
 
       // Scale the distance by the size of the object
@@ -106,18 +108,34 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       if (engine && scene.current) {
         deviceSourceManager.current = new DeviceSourceManager(engine);
         deviceSourceManager.current.onAfterDeviceConnectedObservable.add(deviceEventData => {
+          numInputs.current++;
           deviceSourceManager.current?.getDeviceSource(deviceEventData.deviceType, deviceEventData.deviceSlot)?.onInputChangedObservable.add(inputEventData => {
-            if (inputEventData && model.current && modelPlaced.current && xrSession.current && inputEventData.inputIndex == PointerInput.Horizontal && inputEventData.previousState !== null && inputEventData.currentState !== null) {
+            if (inputEventData && model.current && modelPlaced.current && xrSession.current && inputEventData.previousState !== null && inputEventData.currentState !== null) {
               const diff = inputEventData.previousState - inputEventData.currentState;
-              if (Math.abs(diff) > 2)
-              {
-                model.current.rotate(Vector3.Up(), diff / 400);
+              if (numInputs.current >= 2 && inputEventData.inputIndex == PointerInput.Horizontal && deviceEventData.deviceSlot == 0) {
+                if (Math.abs(diff) > 2) {
+                  model.current.rotate(Vector3.Up(), diff / 400);
+                }
+              }
+              else if (numInputs.current == 1) {
+                if (inputEventData.inputIndex == PointerInput.Horizontal)
+                {
+                  model.current.position.x -= diff / 1250;
+                }
+                else 
+                {
+                  model.current.position.z += diff / 1250;
+                }
               }
             }
           });
  
          placeModel(); 
         });
+
+      deviceSourceManager.current.onAfterDeviceDisconnectedObservable.add(deviceEventData => {
+        numInputs.current--;
+      })
     }
   }, [engine, scene.current, camera, model.current, xrSession.current]);
 
