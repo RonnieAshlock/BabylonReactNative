@@ -49,17 +49,18 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       placementIndicator.current.setEnabled(false);
 
       try {
-      const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
+      const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF/BoxAnimated.gltf");
       model.current = newModel.meshes[0];
 
       // Scale the distance by the size of the object
       const { min, max } = model.current.getHierarchyBoundingVectors(true, null);
 
-      model.current.position = arcRotateCam.position.add(arcRotateCam.getForwardRay().direction.scale(1));
+      model.current.position = arcRotateCam.position.add(arcRotateCam.getForwardRay().direction.scale(2));
       model.current.scalingDeterminant = 0;
 
-      // Set the target scale to cap the size of the model to .5 meters deep.
+      // Set the target scale to cap the size of the model to .25 meters deep.
       targetScale.current = .25 / (max.z - min.z);
+      model.current.position.y -= (targetScale.current * (max.y - min.y));
 
       arcRotateCam.setTarget(model.current);
       arcRotateCam.beta -= Math.PI / 8;
@@ -88,7 +89,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       model.current.setEnabled(true);
       model.current.position = placementIndicator.current.position.clone();
       const { min, max } = model.current.getHierarchyBoundingVectors(true, null);
-      model.current.position.y += (max.y - min.y) / 2;
+      model.current.position.y += targetScale.current * (max.y - min.y) / 2;
       model.current.scalingDeterminant = 0;
 
       const startTime = Date.now();
