@@ -8,7 +8,7 @@
 import React, { useState, FunctionComponent, useEffect, useCallback, useRef } from 'react';
 import { View, ViewProps, StyleSheet } from 'react-native';
 import { EngineView, useEngine } from 'react-native-babylon';
-import { DeviceSourceManager, DeviceType, PointerInput, PBRMetallicRoughnessMaterial, Color3, Scene, Vector3, Mesh, AbstractMesh, ArcRotateCamera, WebXRSessionManager, WebXRFeatureName, WebXRHitTest, SceneLoader} from '@babylonjs/core';
+import { DeviceSourceManager, DeviceType, PointerInput, HemisphericLight, StandardMaterial, PBRMetallicRoughnessMaterial, Color3, Scene, Vector3, Mesh, AbstractMesh, ArcRotateCamera, WebXRSessionManager, WebXRFeatureName, WebXRHitTest, SceneLoader, PointLight} from '@babylonjs/core';
 import { NavBar } from "./components/NavBar";
 import { TeachingMoment, TeachingMomentType } from "./components/TeachingMoment";
 import { CameraButton } from "./components/CameraButton";
@@ -27,7 +27,6 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const modelPlaced = useRef(false);
   const [showARControls, setShowARControls] = useState(false);
   const targetScale = useRef(.25);
-  const numInputs = useRef(0);
 
   useEffect(() => {
     if (engine) {
@@ -35,33 +34,40 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       }
   }, [engine]);
 
-  const initializeScene = useCallback(async () => {
+  const initializeScene = async () => {
     if (engine) {
       scene.current = new Scene(engine);
       scene.current.createDefaultCamera(true);
       const arcRotateCam = scene.current.activeCamera as ArcRotateCamera;
       setCamera(arcRotateCam);
       cameraInitialPosition.current = arcRotateCam.position.clone();
-      scene.current.createDefaultLight(true);
+
+      var light = new HemisphericLight("light1", new Vector3(0, 5, 0), scene.current);
+      light.diffuse = Color3.White();
+      light.intensity = 1;	
+
       createInputHandling();
 
       placementIndicator.current = Mesh.CreateTorus("placementIndicator", .3, .005, 64);
+      var indicatorMat = new StandardMaterial('noLight', scene.current);
+      indicatorMat.disableLighting = true;
+
+      indicatorMat.emissiveColor = Color3.White();
+      placementIndicator.current.material = indicatorMat;
       placementIndicator.current.scaling = new Vector3(1, 0.01, 1);
       placementIndicator.current.setEnabled(false);
 
-      try {
       const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
       //const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF/BoxAnimated.gltf");
       model.current = newModel.meshes[0];
 
       // Scale the distance by the size of the object
       const { min, max } = model.current.getHierarchyBoundingVectors(true, null);
-
       model.current.position = arcRotateCam.position.add(arcRotateCam.getForwardRay().direction.scale(2));
       model.current.scalingDeterminant = 0;
 
       // Set the target scale to cap the size of the model to .25 meters deep.
-      targetScale.current = .25 / (max.z - min.z);
+      targetScale.current = .3 / (max.z - min.z);
       model.current.position.y -= (targetScale.current * (max.y - min.y));
 
       arcRotateCam.setTarget(model.current);
@@ -79,9 +85,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         }
       };
     }
-    catch (ex) { console.error (ex); }
-  }
-  }, [engine]);
+  };
 
   const placeModel = useCallback(() => {
     if (xrSession.current && !modelPlaced.current && placementIndicator.current && model.current && scene.current) {
@@ -104,40 +108,45 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
     }
   }, [scene.current, camera, model.current, xrSession.current, modelPlaced.current]);
 
-  const createInputHandling = useCallback(() => {
+  const createInputHandling = () => {
       if (engine && scene.current) {
-        deviceSourceManager.current = new DeviceSourceManager(engine);
+        var numInputs = 0;
+        if (!deviceSourceManager.current) { 
+          deviceSourceManager.current = new DeviceSourceManager(engine);
+        }
+
+        deviceSourceManager.current.onAfterDeviceConnectedObservable.clear();
+        deviceSourceManager.current.onAfterDeviceDisconnectedObservable.clear();
+
         deviceSourceManager.current.onAfterDeviceConnectedObservable.add(deviceEventData => {
-          numInputs.current++;
+          numInputs++;
           deviceSourceManager.current?.getDeviceSource(deviceEventData.deviceType, deviceEventData.deviceSlot)?.onInputChangedObservable.add(inputEventData => {
             if (inputEventData && model.current && modelPlaced.current && xrSession.current && inputEventData.previousState !== null && inputEventData.currentState !== null) {
               const diff = inputEventData.previousState - inputEventData.currentState;
-              if (numInputs.current >= 2 && inputEventData.inputIndex == PointerInput.Horizontal && deviceEventData.deviceSlot == 0) {
-                if (Math.abs(diff) > 2) {
-                  model.current.rotate(Vector3.Up(), diff / 400);
-                }
+              if (numInputs == 2 && inputEventData.inputIndex == PointerInput.Horizontal && deviceEventData.deviceSlot == 0) {
+                  model.current.rotate(Vector3.Up(), diff / 200);
               }
-              else if (numInputs.current == 1) {
+              else if (numInputs == 1) {
                 if (inputEventData.inputIndex == PointerInput.Horizontal)
                 {
-                  model.current.position.x -= diff / 1250;
+                  model.current.position.x -= diff / 1000;
                 }
                 else 
                 {
-                  model.current.position.z += diff / 1250;
+                  model.current.position.z += diff / 750;
                 }
               }
             }
           });
- 
-         placeModel(); 
+
+        placeModel(); 
         });
 
       deviceSourceManager.current.onAfterDeviceDisconnectedObservable.add(deviceEventData => {
-        numInputs.current--;
+        numInputs--;
       })
     }
-  }, [engine, scene.current, camera, model.current, xrSession.current]);
+  };
 
   const reset2D = useCallback( () =>{
     if (model.current && scene.current && camera) {
