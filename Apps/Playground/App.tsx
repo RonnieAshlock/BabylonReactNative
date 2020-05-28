@@ -16,10 +16,10 @@ import "@babylonjs/loaders";
 
 class DemoApp {
   private engine : BABYLON.Engine;
-  scene : BABYLON.Scene;
-  camera : BABYLON.ArcRotateCamera;
-  model : BABYLON.AbstractMesh;
-  placementIndicator : BABYLON.AbstractMesh;
+  scene : BABYLON.Scene | undefined;
+  camera : BABYLON.ArcRotateCamera | undefined;
+  model : BABYLON.AbstractMesh | undefined;
+  placementIndicator : BABYLON.AbstractMesh | undefined;
   targetScale: number = .25;
 
   constructor(engine : BABYLON.Engine){
@@ -64,13 +64,38 @@ class DemoApp {
     var that = this;
     const startTime = Date.now();
     this.scene.beforeRender = function () {
-      if (that.model.scalingDeterminant < that.targetScale) {
-        const newScale = that.targetScale * (Date.now() - startTime) / 500;
-        that.model.scalingDeterminant = newScale > that.targetScale ? that.targetScale: newScale;
+      if (that.model){
+        if (that.model.scalingDeterminant < that.targetScale) {
+          const newScale = that.targetScale * (Date.now() - startTime) / 500;
+          that.model.scalingDeterminant = newScale > that.targetScale ? that.targetScale: newScale;
+        }
+        
+        that.model.rotate(BABYLON.Vector3.Up(), 0.005 * scene.getAnimationRatio());
       }
-      
-      that.model.rotate(BABYLON.Vector3.Up(), 0.005 * scene.getAnimationRatio());
     };
+  }
+
+  public reset2D = () => {
+    if (this.model && this.scene && this.camera) {
+      this.model.setEnabled(true);
+
+      this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(2));
+      this.model.scalingDeterminant = 0;
+
+      this.camera.setTarget(this.model);
+      const startTime = Date.now();
+      var that = this;
+      this.scene.beforeRender = function () {
+        if (that.model && that.scene) {
+          if (that.model.scalingDeterminant < that.targetScale) {
+            const newScale = that.targetScale * (Date.now() - startTime) / 500;
+            that.model.scalingDeterminant = newScale > that.targetScale ? that.targetScale: newScale;
+          }
+
+          that.model.rotate(BABYLON.Vector3.Up(), 0.005 * that.scene.getAnimationRatio());
+        }
+      }; 
+    }
   }
 }
 
@@ -171,29 +196,6 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
     }
   };
 
-  const reset2D = useCallback( () =>{
-    if (model.current && scene.current && camera) {
-      model.current.setEnabled(true);
-      placementIndicator.current?.setEnabled(false);
-
-      model.current.position = camera.position.add(camera.getForwardRay().direction.scale(2));
-      model.current.scalingDeterminant = 0;
-
-      camera.setTarget(model.current);
-      const startTime = Date.now();
-      scene.current.beforeRender = function () {
-        if (model.current && scene.current) {
-          if (model.current.scalingDeterminant < targetScale.current) {
-            const newScale = targetScale.current * (Date.now() - startTime) / 500;
-            model.current.scalingDeterminant = newScale > targetScale.current ? targetScale.current: newScale;
-          }
-
-          model.current.rotate(BABYLON.Vector3.Up(), 0.005 * scene.current.getAnimationRatio());
-        }
-      }; 
-    }
-  }, [model.current, camera, scene.current]);
-
   const resetClick = useCallback(() => {
     setTeachingMomentVisible(false);
     if (model.current && camera && scene.current && placementIndicator.current) {
@@ -205,7 +207,8 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       }
       else
       {
-        reset2D();
+        placementIndicator.current?.setEnabled(false);
+        demoAppClass.current?.reset2D();
       }
     }
   }, [model.current, camera, scene.current, xrSession.current]);
@@ -250,7 +253,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         modelPlaced.current = true;
         setTeachingMomentVisible(false);
         setShowARControls(false);
-        reset2D();
+        demoAppClass.current?.reset2D();
       } else {
         if (model.current && scene.current && placementIndicator.current) {
           const xr = await scene.current.createDefaultXRExperienceAsync({ disableDefaultUI: true, disableTeleportation: true })
