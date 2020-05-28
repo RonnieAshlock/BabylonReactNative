@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@babylonjs/core": "4.2.0-alpha.17",
-    "@babylonjs/loaders": "^4.1.0",
+    "@babylonjs/loaders": "4.2.0-alpha.17",
     "@react-native-community/slider": "^2.0.9",
     "react": "16.9.0",
     "react-native": "0.62.1",
