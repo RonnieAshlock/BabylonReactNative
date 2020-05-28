@@ -8,25 +8,85 @@
 import React, { useState, FunctionComponent, useEffect, useCallback, useRef } from 'react';
 import { View, ViewProps, StyleSheet } from 'react-native';
 import { EngineView, useEngine } from 'react-native-babylon';
-import { DeviceSourceManager, DeviceType, PointerInput, HemisphericLight, StandardMaterial, PBRMetallicRoughnessMaterial, Color3, Scene, Vector3, Mesh, AbstractMesh, ArcRotateCamera, WebXRSessionManager, WebXRFeatureName, WebXRHitTest, SceneLoader, PointLight} from '@babylonjs/core';
+import * as BABYLON from '@babylonjs/core';
 import { NavBar } from "./components/NavBar";
 import { TeachingMoment, TeachingMomentType } from "./components/TeachingMoment";
 import { CameraButton } from "./components/CameraButton";
 import "@babylonjs/loaders";
 
+class DemoApp {
+  private engine : BABYLON.Engine;
+  scene : BABYLON.Scene;
+  camera : BABYLON.ArcRotateCamera;
+  model : BABYLON.AbstractMesh;
+  placementIndicator : BABYLON.AbstractMesh;
+  targetScale: number = .25;
+
+  constructor(engine : BABYLON.Engine){
+    this.engine = engine;
+  }
+  
+  public initializeScene = async () => {
+    const scene = new BABYLON.Scene(this.engine);
+    this.scene = scene;
+    this.scene.createDefaultCamera(true);
+    this.camera = this.scene.activeCamera as BABYLON.ArcRotateCamera;
+
+    var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 5, 0), this.scene);
+    light.diffuse = BABYLON.Color3.White();
+    light.intensity = 1;
+
+    this.placementIndicator = BABYLON.Mesh.CreateTorus("placementIndicator", .3, .005, 64);
+    var indicatorMat = new BABYLON.StandardMaterial('noLight', this.scene);
+    indicatorMat.disableLighting = true;
+
+    indicatorMat.emissiveColor = BABYLON.Color3.White();
+    this.placementIndicator.material = indicatorMat;
+    this.placementIndicator.scaling = new BABYLON.Vector3(1, 0.01, 1);
+    this.placementIndicator.setEnabled(false);
+
+    const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
+    //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF/BoxAnimated.gltf");
+    this.model = newModel.meshes[0];
+
+    // Scale the distance by the size of the object
+    const { min, max } = this.model.getHierarchyBoundingVectors(true, null);
+    this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(2));
+    this.model.scalingDeterminant = 0;
+
+    // Set the target scale to cap the size of the model to .25 meters deep.
+    this.targetScale = .3 / (max.z - min.z);
+    this.model.position.y -= (this.targetScale * (max.y - min.y));
+
+    this.camera.setTarget(this.model);
+    this.camera.beta -= Math.PI / 8;
+
+    var that = this;
+    const startTime = Date.now();
+    this.scene.beforeRender = function () {
+      if (that.model.scalingDeterminant < that.targetScale) {
+        const newScale = that.targetScale * (Date.now() - startTime) / 500;
+        that.model.scalingDeterminant = newScale > that.targetScale ? that.targetScale: newScale;
+      }
+      
+      that.model.rotate(BABYLON.Vector3.Up(), 0.005 * scene.getAnimationRatio());
+    };
+  }
+}
+
 const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const engine = useEngine();
   const [teachingMomentVisible, setTeachingMomentVisible] = useState(false);
-  const [camera, setCamera] = useState<ArcRotateCamera>();
-  const model = useRef<AbstractMesh>();
-  const placementIndicator = useRef<AbstractMesh>();
-  const scene = useRef<Scene>();
-  const xrSession = useRef<WebXRSessionManager>();
-  const cameraInitialPosition = useRef<Vector3>(Vector3.Zero());
-  const deviceSourceManager = useRef<DeviceSourceManager>();
+  const [camera, setCamera] = useState<BABYLON.ArcRotateCamera>();
+  const model = useRef<BABYLON.AbstractMesh>();
+  const placementIndicator = useRef<BABYLON.AbstractMesh>();
+  const scene = useRef<BABYLON.Scene>();
+  const xrSession = useRef<BABYLON.WebXRSessionManager>();
+  const deviceSourceManager = useRef<BABYLON.DeviceSourceManager>();
   const modelPlaced = useRef(false);
   const [showARControls, setShowARControls] = useState(false);
   const targetScale = useRef(.25);
+  const demoAppClass = useRef<DemoApp>();
 
   useEffect(() => {
     if (engine) {
@@ -36,54 +96,17 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
 
   const initializeScene = async () => {
     if (engine) {
-      scene.current = new Scene(engine);
-      scene.current.createDefaultCamera(true);
-      const arcRotateCam = scene.current.activeCamera as ArcRotateCamera;
-      setCamera(arcRotateCam);
-      cameraInitialPosition.current = arcRotateCam.position.clone();
+      demoAppClass.current = new DemoApp(engine);
+      await demoAppClass.current.initializeScene();
 
-      var light = new HemisphericLight("light1", new Vector3(0, 5, 0), scene.current);
-      light.diffuse = Color3.White();
-      light.intensity = 1;	
+      // Pull all of the member variables out into our useRefs.
+      scene.current = demoAppClass.current.scene;
+      setCamera(demoAppClass.current.camera);
+      model.current = demoAppClass.current.model;
+      placementIndicator.current = demoAppClass.current.placementIndicator;      
+      targetScale.current = demoAppClass.current.targetScale;
 
       createInputHandling();
-
-      placementIndicator.current = Mesh.CreateTorus("placementIndicator", .3, .005, 64);
-      var indicatorMat = new StandardMaterial('noLight', scene.current);
-      indicatorMat.disableLighting = true;
-
-      indicatorMat.emissiveColor = Color3.White();
-      placementIndicator.current.material = indicatorMat;
-      placementIndicator.current.scaling = new Vector3(1, 0.01, 1);
-      placementIndicator.current.setEnabled(false);
-
-      const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
-      //const newModel = await SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF/BoxAnimated.gltf");
-      model.current = newModel.meshes[0];
-
-      // Scale the distance by the size of the object
-      const { min, max } = model.current.getHierarchyBoundingVectors(true, null);
-      model.current.position = arcRotateCam.position.add(arcRotateCam.getForwardRay().direction.scale(2));
-      model.current.scalingDeterminant = 0;
-
-      // Set the target scale to cap the size of the model to .25 meters deep.
-      targetScale.current = .3 / (max.z - min.z);
-      model.current.position.y -= (targetScale.current * (max.y - min.y));
-
-      arcRotateCam.setTarget(model.current);
-      arcRotateCam.beta -= Math.PI / 8;
-
-      const startTime = Date.now();
-      scene.current.beforeRender = function () {
-        if (model.current && scene.current) {
-          if (model.current.scalingDeterminant < targetScale.current) {
-            const newScale = targetScale.current * (Date.now() - startTime) / 500;
-            model.current.scalingDeterminant = newScale > targetScale.current ? targetScale.current: newScale;
-          }
-          
-          model.current.rotate(Vector3.Up(), 0.005 * scene.current.getAnimationRatio());
-        }
-      };
     }
   };
 
@@ -112,7 +135,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       if (engine && scene.current) {
         var numInputs = 0;
         if (!deviceSourceManager.current) { 
-          deviceSourceManager.current = new DeviceSourceManager(engine);
+          deviceSourceManager.current = new BABYLON.DeviceSourceManager(engine);
         }
 
         deviceSourceManager.current.onAfterDeviceConnectedObservable.clear();
@@ -123,11 +146,11 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
           deviceSourceManager.current?.getDeviceSource(deviceEventData.deviceType, deviceEventData.deviceSlot)?.onInputChangedObservable.add(inputEventData => {
             if (inputEventData && model.current && modelPlaced.current && xrSession.current && inputEventData.previousState !== null && inputEventData.currentState !== null) {
               const diff = inputEventData.previousState - inputEventData.currentState;
-              if (numInputs == 2 && inputEventData.inputIndex == PointerInput.Horizontal && deviceEventData.deviceSlot == 0) {
-                  model.current.rotate(Vector3.Up(), diff / 200);
+              if (numInputs == 2 && inputEventData.inputIndex == BABYLON.PointerInput.Horizontal && deviceEventData.deviceSlot == 0) {
+                  model.current.rotate(BABYLON.Vector3.Up(), diff / 200);
               }
               else if (numInputs == 1) {
-                if (inputEventData.inputIndex == PointerInput.Horizontal)
+                if (inputEventData.inputIndex == BABYLON.PointerInput.Horizontal)
                 {
                   model.current.position.x -= diff / 1000;
                 }
@@ -165,7 +188,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
             model.current.scalingDeterminant = newScale > targetScale.current ? targetScale.current: newScale;
           }
 
-          model.current.rotate(Vector3.Up(), 0.005 * scene.current.getAnimationRatio());
+          model.current.rotate(BABYLON.Vector3.Up(), 0.005 * scene.current.getAnimationRatio());
         }
       }; 
     }
@@ -233,9 +256,9 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
           const xr = await scene.current.createDefaultXRExperienceAsync({ disableDefaultUI: true, disableTeleportation: true })
           // Set up the hit test.
           const xrHitTestModule = xr.baseExperience.featuresManager.enableFeature(
-            WebXRFeatureName.HIT_TEST,
+            BABYLON.WebXRFeatureName.HIT_TEST,
             "latest",
-             {offsetRay: {origin: {x: 0, y: 0, z: 0}, direction: {x: 0, y: 0, z: -1}}}) as WebXRHitTest;
+             {offsetRay: {origin: {x: 0, y: 0, z: 0}, direction: {x: 0, y: 0, z: -1}}}) as BABYLON.WebXRHitTest;
 
             xrHitTestModule.onHitTestResultObservable.add((results) => {
               if (results.length) {
@@ -259,7 +282,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
           model.current.setEnabled(false);
           modelPlaced.current = false;
           xrSession.current = session;
-          model.current.rotate(Vector3.Up(), 3.14159);
+          model.current.rotate(BABYLON.Vector3.Up(), 3.14159);
         }
       }
     })();
