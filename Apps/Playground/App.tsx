@@ -126,11 +126,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       model.current.setEnabled(true);
       placementIndicator.current?.setEnabled(false);
 
-      // Scale the distance by the size of the object
-      const { min, max } = model.current.getHierarchyBoundingVectors(true, null);
-
-      model.current.position = camera.position.add(camera.getForwardRay().direction.scale(1));
-
+      model.current.position = camera.position.add(camera.getForwardRay().direction.scale(2));
       model.current.scalingDeterminant = 0;
 
       camera.setTarget(model.current);
