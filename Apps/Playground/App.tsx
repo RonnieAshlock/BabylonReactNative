@@ -52,7 +52,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   };
 
   const placeModel = useCallback(() => {
-    if (xrSession.current && !modelPlaced.current && placementIndicator.current && model.current && scene.current) {
+    if (xrSession.current && !modelPlaced.current && placementIndicator.current && placementIndicator.current.isEnabled() && model.current && scene.current) {
       setTeachingMomentVisible(false);
       modelPlaced.current = true;
       model.current.rotationQuaternion = BABYLON.Quaternion.Identity();
@@ -249,3 +249,4 @@ const App = () => {
 };
 
 export default App;
+console.disableYellowBox = true;

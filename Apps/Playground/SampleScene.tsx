@@ -53,15 +53,14 @@ export class SampleScene {
     this.targetScale = .3 / (max.z - min.z);
 
     // Set up an animation loop to show the cube spinning.
-    var that = this;
     const startTime = Date.now();
-    this.scene.beforeRender = function () {
-      if (that.model && that.scene) {
-        if (that.model.scalingDeterminant < that.targetScale) {
-          const newScale = that.targetScale * (Date.now() - startTime) / 500;
-          that.model.scalingDeterminant = newScale > that.targetScale ? that.targetScale : newScale;
+    this.scene.beforeRender = () => {
+      if (this.model && this.scene) {
+        if (this.model.scalingDeterminant < this.targetScale) {
+          const newScale = this.targetScale * (Date.now() - startTime) / 500;
+          this.model.scalingDeterminant = newScale > this.targetScale ? this.targetScale : newScale;
         }
-        that.model.rotate(BABYLON.Vector3.Up(), 0.005 * that.scene.getAnimationRatio());
+        this.model.rotate(BABYLON.Vector3.Up(), 0.005 * this.scene.getAnimationRatio());
       }
     };
   };
@@ -74,14 +73,14 @@ export class SampleScene {
       this.model.scalingDeterminant = 0;
       this.camera.setTarget(this.model);
       const startTime = Date.now();
-      var that = this;
-      this.scene.beforeRender = function () {
-        if (that.model && that.scene) {
-          if (that.model.scalingDeterminant < that.targetScale) {
-            const newScale = that.targetScale * (Date.now() - startTime) / 500;
-            that.model.scalingDeterminant = newScale > that.targetScale ? that.targetScale : newScale;
+      this.scene.beforeRender = () => {
+        if (this.model && this.scene) {
+          if (this.model.scalingDeterminant < this.targetScale) {
+            const newScale = this.targetScale * (Date.now() - startTime) / 500;
+            this.model.scalingDeterminant = newScale > this.targetScale ? this.targetScale : newScale;
           }
-          that.model.rotate(BABYLON.Vector3.Up(), 0.005 * that.scene.getAnimationRatio());
+
+          this.model.rotate(BABYLON.Vector3.Up(), 0.005 * this.scene.getAnimationRatio());
         }
       };
     }
