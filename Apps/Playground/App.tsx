@@ -27,7 +27,6 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const [showARControls, setShowARControls] = useState(false);
   const targetScale = useRef(.25);
   const sampleScene = useRef<SampleScene>();
-  const [forceUpdate, setForceUpdate] = useState(false);
 
   useEffect(() => {
     if (engine) {
@@ -173,7 +172,6 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         placementIndicator.current?.setEnabled(false);
 
         await xrSession.current.exitXRAsync();
-        setForceUpdate(true);
         
         xrSession.current = undefined;
         modelPlaced.current = true;
@@ -212,7 +210,6 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
           modelPlaced.current = false;
           xrSession.current = session;
           model.current.rotate(BABYLON.Vector3.Up(), 3.14159);
-          setForceUpdate(true);
         }
       }
     })();

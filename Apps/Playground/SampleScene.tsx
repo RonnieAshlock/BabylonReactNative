@@ -1,6 +1,9 @@
 import * as BABYLON from '@babylonjs/core';
 import "@babylonjs/loaders";
 
+// To run this code in the playground copy everything after the Export below down
+// and uncomment the final lines.
+
 export class SampleScene {
   private engine: BABYLON.Engine;
   scene: BABYLON.Scene | undefined;
@@ -27,7 +30,7 @@ export class SampleScene {
     light.intensity = 1;
 
     // Create the placement indicator.
-    this.placementIndicator = BABYLON.Mesh.CreateTorus("placementIndicator", .3, .005, 64);
+    this.placementIndicator = BABYLON.Mesh.CreateTorus("placementIndicator", .5, .005, 64);
     var indicatorMat = new BABYLON.StandardMaterial('noLight', this.scene);
     indicatorMat.disableLighting = true;
     indicatorMat.emissiveColor = BABYLON.Color3.White();
@@ -39,7 +42,6 @@ export class SampleScene {
     const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
     //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF/BoxAnimated.gltf");
     this.model = newModel.meshes[0];
-
 
     // Position the model in front of the camera.
     const { min, max } = this.model.getHierarchyBoundingVectors(true, null);
@@ -86,3 +88,14 @@ export class SampleScene {
     }
   };
 }
+
+/*
+// Uncomment these lines in the Babylon.js Playground 
+class Playground { 
+    public static async CreateScene(engine: BABYLON.Engine, canvas: HTMLCanvasElement): Promise<BABYLON.Scene> {
+        var sampleScene = new SampleScene(engine);
+        await sampleScene.initializeSceneAsync();        
+        return sampleScene.scene;
+    }
+}
+*/
