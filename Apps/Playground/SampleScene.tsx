@@ -39,8 +39,8 @@ export class SampleScene {
     this.placementIndicator.setEnabled(false);
 
     // Import a model.
-    const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf");
-    //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF/BoxAnimated.gltf");
+    const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf");
+    //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf");
     this.model = newModel.meshes[0];
 
     // Position the model in front of the camera.
@@ -51,8 +51,8 @@ export class SampleScene {
     this.camera.setTarget(this.model);
     this.camera.beta -= Math.PI / 8;
 
-    // Set the target scale to cap the size of the model to .25 meters deep.
-    this.targetScale = .3 / (max.z - min.z);
+    // Set the target scale to cap the size of the model to .5 meters tall.
+    this.targetScale = .5 / (max.y - min.y);
 
     // Set up an animation loop to show the cube spinning.
     const startTime = Date.now();
