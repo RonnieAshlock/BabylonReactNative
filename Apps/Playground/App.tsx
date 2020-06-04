@@ -12,7 +12,7 @@ import * as BABYLON from '@babylonjs/core';
 import { NavBar } from "./components/NavBar";
 import { TeachingMoment, TeachingMomentType } from "./components/TeachingMoment";
 import { CameraButton } from "./components/CameraButton";
-import { SampleScene } from './SampleScene';
+import { sceneCookie, SampleScene } from './SampleScene';
 
 const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const engine = useEngine();
@@ -27,12 +27,13 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const [showARControls, setShowARControls] = useState(false);
   const targetScale = useRef(.25);
   const sampleScene = useRef<SampleScene>();
+  const sampleCookie = useRef<number>(sceneCookie);
 
   useEffect(() => {
     if (engine) {
       initializeScene();
       }
-  }, [engine]);
+  }, [engine, sampleCookie]);
 
   const initializeScene = async () => {
     if (engine) {
@@ -105,9 +106,9 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
                 }
               }
               // Multi-input do rotation.
-              else if (numInputs == 2 && inputEventData.inputIndex == BABYLON.PointerInput.Horizontal && deviceEventData.deviceSlot == 0) {
-                model.current.rotate(BABYLON.Vector3.Up(), diff / 200);
-              }
+              // else if (numInputs == 2 && inputEventData.inputIndex == BABYLON.PointerInput.Horizontal && deviceEventData.deviceSlot == 0) {
+              //   model.current.rotate(BABYLON.Vector3.Up(), diff / 200);
+              // }
             }
           });
 

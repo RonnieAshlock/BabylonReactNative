@@ -1,9 +1,10 @@
 import * as BABYLON from '@babylonjs/core';
 import "@babylonjs/loaders";
 
+export const cookie = 1;
+
 // To run this code in the playground copy everything after the Export below down
 // and uncomment the final lines.
-
 export class SampleScene {
   private engine: BABYLON.Engine;
   scene: BABYLON.Scene | undefined;
@@ -12,12 +13,14 @@ export class SampleScene {
   placementIndicator: BABYLON.AbstractMesh | undefined;
   targetScale: number = .25;
 
+  public static modelUrl: string = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf";
+
   constructor(engine: BABYLON.Engine) {
     this.engine = engine;
   }
 
   public initializeSceneAsync = async () => {
-    // Create the scene.
+    // Create the scene. 
     this.scene = new BABYLON.Scene(this.engine);
 
     // Setup the camera.
@@ -36,10 +39,10 @@ export class SampleScene {
     indicatorMat.emissiveColor = BABYLON.Color3.White();
     this.placementIndicator.material = indicatorMat;
     this.placementIndicator.scaling = new BABYLON.Vector3(1, 0.01, 1);
-    this.placementIndicator.setEnabled(false);
+    this.placementIndicator.setEnabled(false); 
 
     // Import a model.
-    const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf");
+    const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", SampleScene.modelUrl);
     //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf");
     this.model = newModel.meshes[0];
 
