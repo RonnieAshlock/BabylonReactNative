@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import "@babylonjs/loaders";
 
-export const cookie = 1;
+export const sceneCookie = 1;
 
 // To run this code in the playground copy everything after the Export below down
 // and uncomment the final lines.
