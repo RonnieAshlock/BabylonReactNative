@@ -13,6 +13,7 @@ import { NavBar } from "./components/NavBar";
 import { TeachingMoment, TeachingMomentType } from "./components/TeachingMoment";
 import { CameraButton } from "./components/CameraButton";
 import { sceneCookie, SampleScene } from './SampleScene';
+import { WebXRAnchorSystem } from '@babylonjs/core';
 
 const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const engine = useEngine();
@@ -28,6 +29,8 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const targetScale = useRef(.25);
   const sampleScene = useRef<SampleScene>();
   const sampleCookie = useRef<number>(sceneCookie);
+  const anchor = useRef<any>();
+  const anchorCreated = useRef<boolean>(false);
 
   useEffect(() => {
     if (engine) {
@@ -188,20 +191,57 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
             "latest",
              {offsetRay: {origin: {x: 0, y: 0, z: 0}, direction: {x: 0, y: 0, z: -1}}}) as BABYLON.WebXRHitTest;
 
-            xrHitTestModule.onHitTestResultObservable.add((results) => {
-              if (results.length) {
-                if (!modelPlaced.current) {
-                    setTeachingMomentVisible(true);
-                  placementIndicator.current?.setEnabled(true);
-                }
-                else {
-                  placementIndicator.current?.setEnabled(false);
-                }
-                
-                if (placementIndicator.current) {
-                  placementIndicator.current.position = results[0].position;
-                }
+          const xrAnchorModule = xr.baseExperience.featuresManager.enableFeature(
+              BABYLON.WebXRFeatureName.ANCHOR_SYSTEM,
+              "latest") as WebXRAnchorSystem;
+
+          xrAnchorModule.onAnchorAddedObservable.add(anchor => {
+            anchor.attachedNode = model.current.clone("clonebebbeh");
+            anchor.attachedNode?.setEnabled(true);
+            console.log("anchor atttached.");
+          });
+          xrAnchorModule.onAnchorRemovedObservable.add(anchor => {
+            console.log("anchor detached.");
+          });
+
+          var old = 0;
+
+          xrAnchorModule.onAnchorUpdatedObservable.add(anchor =>{
+            if (old != anchor.transformationMatrix.toArray()[0])
+            {
+              console.log(anchor.transformationMatrix.toArray()[0]);
+              old = anchor.transformationMatrix.toArray()[0];
+            }
+          });
+
+          xrHitTestModule.onHitTestResultObservable.add((results) => {
+            if (results.length) {
+              if (!anchor.current && !anchorCreated.current)
+              {
+                anchorCreated.current = true;
+                xrAnchorModule.addAnchorAtPositionAndRotationAsync(results[0].position, results[0].rotationQuaternion).then((webXRAnchor : XRAnchor) => {
+                  console.log("attached anchor");
+                  anchor.current = webXRAnchor
+                 });
+
+                /*xrAnchorModule.addAnchorPointUsingHitTestResultAsync(results[0]).then((webXRAnchor : XRAnchor) => {
+                    console.log("attached anchor");
+                    anchor.current = webXRAnchor
+                  });*/
               }
+
+              if (!modelPlaced.current) {
+                  setTeachingMomentVisible(true);
+                placementIndicator.current?.setEnabled(true);
+              }
+              else {
+                placementIndicator.current?.setEnabled(false);
+              }
+              
+              if (placementIndicator.current) {
+                placementIndicator.current.position = results[0].position;
+              }
+            }
           });
 
           const session = await xr.baseExperience.enterXRAsync("immersive-ar", "unbounded", xr.renderTarget);

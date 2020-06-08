@@ -42,9 +42,10 @@ export class SampleScene {
     this.placementIndicator.setEnabled(false); 
 
     // Import a model.
-    const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", SampleScene.modelUrl);
+    this.model = BABYLON.Mesh.CreateBox("box", 0.3, this.scene);
+    //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", SampleScene.modelUrl);
     //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf");
-    this.model = newModel.meshes[0];
+    //this.model = newModel.meshes[0];
 
     // Position the model in front of the camera.
     const { min, max } = this.model.getHierarchyBoundingVectors(true, null);
