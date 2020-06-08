@@ -196,7 +196,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
               "latest") as WebXRAnchorSystem;
 
           xrAnchorModule.onAnchorAddedObservable.add(anchor => {
-            anchor.attachedNode = model.current.clone("clonebebbeh");
+            anchor.attachedNode = model.current.clone("modelClone");
             anchor.attachedNode?.setEnabled(true);
             console.log("anchor atttached.");
           });
@@ -204,25 +204,15 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
             console.log("anchor detached.");
           });
 
-          var old = 0;
-
-          xrAnchorModule.onAnchorUpdatedObservable.add(anchor =>{
-            if (old != anchor.transformationMatrix.toArray()[0])
-            {
-              console.log(anchor.transformationMatrix.toArray()[0]);
-              old = anchor.transformationMatrix.toArray()[0];
-            }
-          });
-
           xrHitTestModule.onHitTestResultObservable.add((results) => {
             if (results.length) {
               if (!anchor.current && !anchorCreated.current)
               {
-                anchorCreated.current = true;
+                /*anchorCreated.current = true;
                 xrAnchorModule.addAnchorAtPositionAndRotationAsync(results[0].position, results[0].rotationQuaternion).then((webXRAnchor : XRAnchor) => {
                   console.log("attached anchor");
                   anchor.current = webXRAnchor
-                 });
+                 });*/
 
                 /*xrAnchorModule.addAnchorPointUsingHitTestResultAsync(results[0]).then((webXRAnchor : XRAnchor) => {
                     console.log("attached anchor");

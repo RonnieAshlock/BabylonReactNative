@@ -13,8 +13,6 @@ export class SampleScene {
   placementIndicator: BABYLON.AbstractMesh | undefined;
   targetScale: number = .25;
 
-  public static modelUrl: string = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf";
-
   constructor(engine: BABYLON.Engine) {
     this.engine = engine;
   }
@@ -42,10 +40,10 @@ export class SampleScene {
     this.placementIndicator.setEnabled(false); 
 
     // Import a model.
-    this.model = BABYLON.Mesh.CreateBox("box", 0.3, this.scene);
-    //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", SampleScene.modelUrl);
+    //this.model = BABYLON.Mesh.CreateBox("box", 0.3, this.scene);
+    const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf");
     //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf");
-    //this.model = newModel.meshes[0];
+    this.model = newModel.meshes[0];
 
     // Position the model in front of the camera.
     const { min, max } = this.model.getHierarchyBoundingVectors(true, null);
