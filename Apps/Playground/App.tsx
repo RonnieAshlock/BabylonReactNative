@@ -6,14 +6,16 @@
  */
 
 import React, { useState, FunctionComponent, useEffect, useCallback, useRef } from 'react';
-import { View, ViewProps, StyleSheet } from 'react-native';
-import { EngineView, useEngine } from 'react-native-babylon';
+import { SafeAreaView, StatusBar, Button, View, Text, ViewProps, StyleSheet } from 'react-native';
+
+import { EngineView, useEngine } from '@babylonjs/react-native';
 import * as BABYLON from '@babylonjs/core';
 import { NavBar } from "./components/NavBar";
 import { TeachingMoment, TeachingMomentType } from "./components/TeachingMoment";
 import { CameraButton } from "./components/CameraButton";
 import { sceneCookie, SampleScene } from './SampleScene';
 import { WebXRAnchorSystem } from '@babylonjs/core';
+import Slider from '@react-native-community/slider';
 
 const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const engine = useEngine();
