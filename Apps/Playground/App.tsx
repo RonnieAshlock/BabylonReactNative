@@ -62,19 +62,12 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       modelPlaced.current = true;
       model.current.rotationQuaternion = BABYLON.Quaternion.Identity();
       placementIndicator.current.setEnabled(false);
-      model.current.setEnabled(true);
       model.current.position = placementIndicator.current.position.clone();
-      const { min, max } = model.current.getHierarchyBoundingVectors(true, null);
-      model.current.position.y += targetScale.current * (max.y - min.y) / 2;
-      model.current.scalingDeterminant = 0;
+      model.current.scalingDeterminant = targetScale.current;
+      model.current.position.y += targetScale.current / 2;
+      model.current.setEnabled(true);
 
-      const startTime = Date.now();
-      scene.current.beforeRender = function () {
-        if (model.current && model.current.scalingDeterminant < targetScale.current) {
-          const newScale = targetScale.current * (Date.now() - startTime) / 500;
-          model.current.scalingDeterminant = newScale > targetScale.current ? targetScale.current: newScale;
-        }
-    };      
+      scene.current.beforeRender = null;      
     }
   }, [scene.current, camera, model.current, xrSession.current, modelPlaced.current]);
 
@@ -111,9 +104,9 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
                 }
               }
               // Multi-input do rotation.
-              // else if (numInputs == 2 && inputEventData.inputIndex == BABYLON.PointerInput.Horizontal && deviceEventData.deviceSlot == 0) {
-              //   model.current.rotate(BABYLON.Vector3.Up(), diff / 200);
-              // }
+              else if (numInputs == 2 && inputEventData.inputIndex == BABYLON.PointerInput.Horizontal && deviceEventData.deviceSlot == 0) {
+                model.current.rotate(BABYLON.Vector3.Up(), diff / 200);
+              }
             }
           });
 

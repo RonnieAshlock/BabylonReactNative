@@ -613,6 +613,15 @@
   dependencies:
     tslib ">=1.10.0"
 
+"@babylonjs/loaders@4.2.0-alpha.21":
+  version "4.2.0-alpha.21"
+  resolved "https://registry.yarnpkg.com/@babylonjs/loaders/-/loaders-4.2.0-alpha.21.tgz#149e16bcf0e38a3b3b250b6c99ed3b610b04f424"
+  integrity sha512-I4kvEuy0RTwkh1XYm5hZ2qcLEFIw5mTsyny+6gjwnLdyWzPNzDTwVUtAVE8+CRSK7Q7SVLXn9N4aH7GVIwcdrg==
+  dependencies:
+    "@babylonjs/core" "4.2.0-alpha.21"
+    babylonjs-gltf2interface "4.2.0-alpha.21"
+    tslib ">=1.10.0"
+
 "@babylonjs/react-native@./node_modules/@babylonjs/react-native":
   version "0.0.1"
 
@@ -1424,6 +1433,11 @@ babel-preset-jest@^24.9.0:
   dependencies:
     "@babel/plugin-syntax-object-rest-spread" "^7.0.0"
     babel-plugin-jest-hoist "^24.9.0"
+
+babylonjs-gltf2interface@4.2.0-alpha.21:
+  version "4.2.0-alpha.21"
+  resolved "https://registry.yarnpkg.com/babylonjs-gltf2interface/-/babylonjs-gltf2interface-4.2.0-alpha.21.tgz#9f9ddc7349cabc79bb4e17d7519811273f3f497a"
+  integrity sha512-O3DmYxFu4vBn9OVO3JqoczHd0YghjbWiTViULcOEe7CCF1mReUFit+oZ6fdMnIrBnuUf81raDJcJCk/wUrhQ2A==
 
 balanced-match@^1.0.0:
   version "1.0.0"

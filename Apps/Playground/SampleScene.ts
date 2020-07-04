@@ -11,7 +11,7 @@ export class SampleScene {
   camera: BABYLON.ArcRotateCamera | undefined;
   model: BABYLON.AbstractMesh | undefined;
   placementIndicator: BABYLON.AbstractMesh | undefined;
-  targetScale: number = .25;
+  targetScale: number = .5;
 
   constructor(engine: BABYLON.Engine) {
     this.engine = engine;
@@ -54,7 +54,7 @@ export class SampleScene {
     this.camera.beta -= Math.PI / 8;
 
     // Set the target scale to cap the size of the model to .5 meters tall.
-    this.targetScale = .5 / (max.y - min.y);
+    this.targetScale = this.targetScale / (max.y - min.y);
 
     // Set up an animation loop to show the cube spinning.
     const startTime = Date.now();
