@@ -20,6 +20,6 @@ export const ARViewerTheme: Theme = {
     disabledBorderColor: "#919191",
     whiteColor: "#FFFFFF",
     fontFamily: "segoeui",
-    iconFontFamily: "ArViewerIcons",
+    iconFontFamily: "segoeui",
     fontSize: 18
 };

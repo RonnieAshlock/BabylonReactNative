@@ -157,7 +157,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
         bottom: 0,
         justifyContent: "center",
         alignItems: "center",
-        alignSelf: "center"
+        alignSelf: "center",
     },
     placementBarContainer: {
       position: 'absolute', minHeight: 50, margin: 10, left: 0, right: 0, bottom: 0,
@@ -251,12 +251,12 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
 
   return (
     <>
-      <View style={props.style}>
+      <SafeAreaView style={props.style}>
         <NavBar resetClickHandler={resetClick} backClickHandler={onToggleXr} />
         <View style={{flex: 1}}>
           <EngineView style={props.style} camera={camera} displayFrameRate={false} />
           { teachingMomentVisible &&
-            <View style={styles.teachingMomentView}>
+            <View style={styles.teachingMomentView} pointerEvents="none">
                 <TeachingMoment teachingMomentType={TeachingMomentType.tapToPlace} />
             </View>
           }
@@ -266,7 +266,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
             </View>
           }
         </View>
-      </View>
+      </SafeAreaView>
     </>
   );
 };

@@ -53,14 +53,12 @@ export const NavBar: FunctionComponent<NavBarProps> = (props: NavBarProps) => {
             <TouchableOpacity
                 onPress={props.backClickHandler}
                 style={styles.buttonStyle}>
-                <Text style={[IconFontStyle.icon, styles.icon]}>{"\uE722"}</Text>
                 <Text style={styles.buttonText}>{"Enter/Exit AR"}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
                 onPress={props.resetClickHandler}
                 style={styles.buttonStyle}>
-                <Text style={[IconFontStyle.icon, styles.icon]}>{"\uE423"}</Text>
                 <Text style={styles.buttonText}>{"Reset"}</Text>
             </TouchableOpacity>
         </View>
