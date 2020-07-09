@@ -52,7 +52,7 @@ pod install --repo-update
 
 ### **Configuring a Mac Dev Environment**
 
-**Required Tools:** [Android Studio](https://developer.android.com/studio/) (including NDK 21.0.6113669), [CMake](https://cmake.org/), [Ninja](https://ninja-build.org/)
+**Required Tools:** [Android Studio](https://developer.android.com/studio/) (including NDK 21.3.6528147), [CMake](https://cmake.org/), [Ninja](https://ninja-build.org/)
 
 - The `PATH` environment variable must include the path to adb (typically ~/Library/Android/sdk/platform-tools/).
 - The `PATH` environment variable must include the path to Ninja, or Ninja must be [installed via a package manager](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
@@ -72,7 +72,7 @@ export ANDROID_AVD_HOME=~/.android/avd
 
 ### **Configuring a Windows Dev Environment**
 
-**Required Tools:** [Android Studio](https://developer.android.com/studio/) (including NDK 21.0.6113669), [CMake](https://cmake.org/), [Ninja](https://ninja-build.org/)
+**Required Tools:** [Android Studio](https://developer.android.com/studio/) (including NDK 21.3.6528147), [CMake](https://cmake.org/), [Ninja](https://ninja-build.org/)
 
 - The `PATH` environment variable must include the path to adb (typically %LOCALAPPDATA%/Android/sdk/platform-tools/).
 - The `PATH` environment variable must include the path to Ninja, or Ninja must be [installed via a package manager](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).  
@@ -96,8 +96,8 @@ After having run the above commands, you can also open `Apps/Playground/android`
 #### iOS
 
 ```
-pushd Apps/Playground/ios
-cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE=../submodules/BabylonNative/Dependencies/ios-cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DDEPLOYMENT_TARGET=12 -DENABLE_GLSLANG_BINARIES=OFF -DSPIRV_CROSS_CLI=OFF .
+pushd Apps/Playground/node_modules/@babylonjs/react-native/ios
+cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE=../submodules/BabylonNative/Dependencies/ios-cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DENABLE_ARC=0 -DDEPLOYMENT_TARGET=12 -DENABLE_GLSLANG_BINARIES=OFF -DSPIRV_CROSS_CLI=OFF .
 popd
 
 cd Apps/Playground
@@ -108,14 +108,30 @@ After having run the above commands, you can also open `Apps/Playground/ios/Play
 
 ### **Building the NPM Package**
 
-If you want to test using a local build of the NPM package with your own React Native app, you can do so with the `npm pack` command on either Mac or Windows.
+An NPM package can be built in two different ways: as source, and as binaries. Source is useful if you want to debug the Babylon React Native source in the context of the project consuming it, though configuration is a bit more involved. Binaries are useful in that they simplify configuration in the consuming app, though they cannot be debugged so easily.
+
+#### Source Package
+
+If you want to test using a local build of the source-based NPM package with your own React Native app, you can do so with the `npm pack` command on either Mac or Windows.
 
 ```
 cd Apps/Playground/node_modules/@babylonjs/react-native
 npm pack
 ```
 
-This will produce a zipped local NPM package that can be installed into a React Native application for testing purposes.
+This will produce a zipped local NPM source-based package that can be installed into a React Native application for testing purposes.
+
+#### Binary Package
+
+If you want to test using a local build of the binary-based NPM package with your own React Native app, you can do so with a `gulp` command on a Mac (this requires a Mac as it builds binaries for both iOS and Android).
+
+```
+cd Package
+npm install
+gulp pack
+```
+
+This will produce a zipped local NPM binary-based package that can be installed into a React Native application for testing purposes.
 
 ## Security
 
