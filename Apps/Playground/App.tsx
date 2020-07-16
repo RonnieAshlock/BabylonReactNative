@@ -194,6 +194,56 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
             "latest",
              {offsetRay: {origin: {x: 0, y: 0, z: 0}, direction: {x: 0, y: 0, z: -1}}}) as BABYLON.WebXRHitTest;
 
+          // Do some plane shtuff.
+          const xrPlanes = xr.baseExperience.featuresManager.enableFeature(BABYLON.WebXRFeatureName.PLANE_DETECTION, "latest") as BABYLON.WebXRPlaneDetector;
+          console.log("Enabled plane detection.");
+          const planes: any[] = [];
+
+          xrPlanes.onPlaneAddedObservable.add(webXRPlane => {
+            if (scene.current) {
+              console.log("Got new plane.");
+              let plane : any = webXRPlane;
+              webXRPlane.polygonDefinition.push(webXRPlane.polygonDefinition[0]);
+              plane.mesh = BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.02, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);;
+              
+              planes[plane.id] = (plane.mesh);
+              const mat = new BABYLON.StandardMaterial('noLight', scene.current);;
+              plane.mesh.material = mat;
+      
+              plane.mesh.rotationQuaternion = new BABYLON.Quaternion();
+              plane.transformationMatrix.decompose(plane.mesh.scaling, plane.mesh.rotationQuaternion, plane.mesh.position);
+            }
+          });
+      
+          xrPlanes.onPlaneUpdatedObservable.add(webXRPlane => {
+            console.log("Got plane update.");
+            let plane : any = webXRPlane;
+              let mat;
+              if (plane.mesh) {
+                  mat = plane.mesh.material;
+                  plane.mesh.dispose(false, false);
+              }
+              const some = plane.polygonDefinition.some((p: any) => !p);
+              if (some) {
+                  return;
+              }
+              plane.polygonDefinition.push(plane.polygonDefinition[0]);
+              plane.mesh = plane.mesh = BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.02, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
+              planes[plane.id] = (plane.mesh);
+              plane.mesh.material = mat;
+              plane.mesh.rotationQuaternion = new BABYLON.Quaternion();
+              plane.transformationMatrix.decompose(plane.mesh.scaling, plane.mesh.rotationQuaternion, plane.mesh.position);
+              plane.mesh.receiveShadows = true;
+          });
+      
+          xrPlanes.onPlaneRemovedObservable.add(webXRPlane => {
+            console.log("Plane removed.");
+            let plane : any = webXRPlane;
+              if (plane && planes[plane.id]) {
+                  planes[plane.id].dispose()
+              }
+          });   
+
           const xrAnchorModule = xr.baseExperience.featuresManager.enableFeature(
               BABYLON.WebXRFeatureName.ANCHOR_SYSTEM,
               "latest") as WebXRAnchorSystem;
