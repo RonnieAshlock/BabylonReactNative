@@ -6,8 +6,6 @@ export type Theme = {
     disabledBorderColor: string;
     whiteColor: string;
     fontSize: number;
-    fontFamily: string;
-    iconFontFamily: string;
 };
 
 // Note, this can change to a React Context in the future to change these properties.
@@ -19,7 +17,5 @@ export const ARViewerTheme: Theme = {
     disabledTextColor: "#767673",
     disabledBorderColor: "#919191",
     whiteColor: "#FFFFFF",
-    fontFamily: "segoeui",
-    iconFontFamily: "segoeui",
     fontSize: 18
 };
