@@ -15,7 +15,7 @@ import { TeachingMoment, TeachingMomentType } from "./components/TeachingMoment"
 import { CameraButton } from "./components/CameraButton";
 import { sceneCookie, SampleScene } from './SampleScene';
 import { WebXRAnchorSystem } from '@babylonjs/core';
-import Slider from '@react-native-community/slider';
+const earcut = require('earcut');
 
 const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
   const engine = useEngine();
@@ -64,8 +64,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
       placementIndicator.current.setEnabled(false);
       model.current.setEnabled(true);
       model.current.position = placementIndicator.current.position.clone();
-      const { min, max } = model.current.getHierarchyBoundingVectors(true, null);
-      model.current.position.y += targetScale.current * (max.y - min.y) / 2;
+      model.current.position.y += targetScale.current / 2;
       model.current.scalingDeterminant = 0;
 
       const startTime = Date.now();
@@ -204,10 +203,12 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
               console.log("Got new plane.");
               let plane : any = webXRPlane;
               webXRPlane.polygonDefinition.push(webXRPlane.polygonDefinition[0]);
-              plane.mesh = BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.02, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);;
+              plane.mesh = BABYLON.MeshBuilder.CreatePolygon("plane", { shape : plane.polygonDefinition }, scene.current, earcut);              
+              //plane.mesh = BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.02, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);;
               
               planes[plane.id] = (plane.mesh);
               const mat = new BABYLON.StandardMaterial('noLight', scene.current);;
+              mat.alpha = .5;
               plane.mesh.material = mat;
       
               plane.mesh.rotationQuaternion = new BABYLON.Quaternion();
@@ -228,7 +229,8 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
                   return;
               }
               plane.polygonDefinition.push(plane.polygonDefinition[0]);
-              plane.mesh = plane.mesh = BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.02, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
+              plane.mesh = BABYLON.MeshBuilder.CreatePolygon("plane", { shape : plane.polygonDefinition }, scene.current, earcut);
+              //plane.mesh = plane.mesh = BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.02, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
               planes[plane.id] = (plane.mesh);
               plane.mesh.material = mat;
               plane.mesh.rotationQuaternion = new BABYLON.Quaternion();
