@@ -11,7 +11,7 @@ export class SampleScene {
   camera: BABYLON.ArcRotateCamera | undefined;
   model: BABYLON.AbstractMesh | undefined;
   placementIndicator: BABYLON.AbstractMesh | undefined;
-  targetScale: number = .5;
+  targetScale: number = 1;
 
   constructor(engine: BABYLON.Engine) {
     this.engine = engine;
@@ -29,6 +29,7 @@ export class SampleScene {
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 5, 0), this.scene);
     light.diffuse = BABYLON.Color3.White();
     light.intensity = 1;
+    light.specular = new BABYLON.Color3(0, 0, 0);
 
     // Create the placement indicator.
     this.placementIndicator = BABYLON.Mesh.CreateTorus("placementIndicator", .5, .005, 64);
@@ -41,15 +42,18 @@ export class SampleScene {
 
     // Import a model.
     //this.model = BABYLON.Mesh.CreateBox("box", 0.3, this.scene);
-    const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf");
+    //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf");
+    //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://poly.googleusercontent.com/downloads/c/fp/1595152286652373/6xn1irne__S/aduhRbNxsqH/Sonic%20the%20Hedgehog.gltf");
+    const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://poly.googleusercontent.com/downloads/c/fp/1595324547122487/4YajIweD1pN/fAfFoekkdQl/model.gltf");
+    console.error("loaded model.");
     //const newModel = await BABYLON.SceneLoader.ImportMeshAsync("", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf");
     this.model = newModel.meshes[0];
 
     // Position the model in front of the camera.
     const { min, max } = this.model.getHierarchyBoundingVectors(true, null);
-    this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(2));
+    this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(3));
     this.model.scalingDeterminant = 0;
-    this.model.position.y -= (this.targetScale * (max.y - min.y));
+    this.model.lookAt(this.camera.position);
     this.camera.setTarget(this.model);
     this.camera.beta -= Math.PI / 8;
 
@@ -73,7 +77,7 @@ export class SampleScene {
   public reset2D = () => {
     if (this.model && this.scene && this.camera) {
       this.model.setEnabled(true);
-      this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(2));
+      this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(3));
       this.model.scalingDeterminant = 0;
       this.camera.setTarget(this.model);
       const startTime = Date.now();

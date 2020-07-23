@@ -210,7 +210,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
               let plane : any = webXRPlane;
               webXRPlane.polygonDefinition.push(webXRPlane.polygonDefinition[0]);
               plane.mesh = BABYLON.MeshBuilder.CreatePolygon("plane", { shape : plane.polygonDefinition }, scene.current, earcut);              
-              let tubeMesh : BABYLON.Mesh =  BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.01, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
+              let tubeMesh : BABYLON.Mesh =  BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.005, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
               tubeMesh.setParent(plane.mesh);
               
               planes[plane.id] = (plane.mesh);
@@ -237,7 +237,7 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
               }
               plane.polygonDefinition.push(plane.polygonDefinition[0]);
               plane.mesh = BABYLON.MeshBuilder.CreatePolygon("plane", { shape : plane.polygonDefinition }, scene.current, earcut);
-              let tubeMesh : BABYLON.Mesh =  BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.01, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
+              let tubeMesh : BABYLON.Mesh =  BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.005, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
               tubeMesh.setParent(plane.mesh);
               planes[plane.id] = (plane.mesh);
               plane.mesh.material = mat;
