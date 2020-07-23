@@ -209,17 +209,22 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
               console.log("Got new plane.");
               let plane : any = webXRPlane;
               webXRPlane.polygonDefinition.push(webXRPlane.polygonDefinition[0]);
-              plane.mesh = BABYLON.MeshBuilder.CreatePolygon("plane", { shape : plane.polygonDefinition }, scene.current, earcut);              
-              let tubeMesh : BABYLON.Mesh =  BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.005, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
-              tubeMesh.setParent(plane.mesh);
-              
-              planes[plane.id] = (plane.mesh);
-              const mat = new BABYLON.StandardMaterial('noLight', scene.current);
-              mat.diffuseTexture = planeTexture.current;
-              plane.mesh.material = mat;
-      
-              plane.mesh.rotationQuaternion = new BABYLON.Quaternion();
-              plane.transformationMatrix.decompose(plane.mesh.scaling, plane.mesh.rotationQuaternion, plane.mesh.position);
+              try {
+                plane.mesh = BABYLON.MeshBuilder.CreatePolygon("plane", { shape : plane.polygonDefinition }, scene.current, earcut);              
+                let tubeMesh : BABYLON.Mesh =  BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.005, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
+                tubeMesh.setParent(plane.mesh);                
+                planes[plane.id] = (plane.mesh);
+                const mat = new BABYLON.StandardMaterial('noLight', scene.current);
+                mat.diffuseTexture = planeTexture.current;
+                plane.mesh.material = mat;
+        
+                plane.mesh.rotationQuaternion = new BABYLON.Quaternion();
+                plane.transformationMatrix.decompose(plane.mesh.scaling, plane.mesh.rotationQuaternion, plane.mesh.position);
+              }
+              catch (ex)
+              {
+                console.error(ex);
+              }
             }
           });
       
@@ -235,15 +240,22 @@ const EngineScreen: FunctionComponent<ViewProps> = (props: ViewProps) => {
               if (some) {
                   return;
               }
+              
               plane.polygonDefinition.push(plane.polygonDefinition[0]);
-              plane.mesh = BABYLON.MeshBuilder.CreatePolygon("plane", { shape : plane.polygonDefinition }, scene.current, earcut);
-              let tubeMesh : BABYLON.Mesh =  BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.005, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
-              tubeMesh.setParent(plane.mesh);
-              planes[plane.id] = (plane.mesh);
-              plane.mesh.material = mat;
-              plane.mesh.rotationQuaternion = new BABYLON.Quaternion();
-              plane.transformationMatrix.decompose(plane.mesh.scaling, plane.mesh.rotationQuaternion, plane.mesh.position);
-              plane.mesh.receiveShadows = true;
+              try {
+                plane.mesh = BABYLON.MeshBuilder.CreatePolygon("plane", { shape : plane.polygonDefinition }, scene.current, earcut);
+                let tubeMesh : BABYLON.Mesh =  BABYLON.TubeBuilder.CreateTube("tube", { path: plane.polygonDefinition, radius: 0.005, sideOrientation: BABYLON.Mesh.FRONTSIDE, updatable: true }, scene.current);
+                tubeMesh.setParent(plane.mesh);
+                planes[plane.id] = (plane.mesh);
+                plane.mesh.material = mat;
+                plane.mesh.rotationQuaternion = new BABYLON.Quaternion();
+                plane.transformationMatrix.decompose(plane.mesh.scaling, plane.mesh.rotationQuaternion, plane.mesh.position);
+                plane.mesh.receiveShadows = true;
+              }
+              catch (ex)
+              {
+                console.error(ex);
+              }
           });
       
           xrPlanes.onPlaneRemovedObservable.add(webXRPlane => {

@@ -11,7 +11,7 @@ export class SampleScene {
   camera: BABYLON.ArcRotateCamera | undefined;
   model: BABYLON.AbstractMesh | undefined;
   placementIndicator: BABYLON.AbstractMesh | undefined;
-  targetScale: number = 1;
+  targetScale: number = 2;
 
   constructor(engine: BABYLON.Engine) {
     this.engine = engine;
@@ -51,14 +51,16 @@ export class SampleScene {
 
     // Position the model in front of the camera.
     const { min, max } = this.model.getHierarchyBoundingVectors(true, null);
-    this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(3));
+
+    // Set the target scale to cap the size of the model to targetScale meters tall.
+    this.targetScale = this.targetScale / (max.y - min.y);
+
+    this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(this.targetScale * 5));
     this.model.scalingDeterminant = 0;
     this.model.lookAt(this.camera.position);
     this.camera.setTarget(this.model);
     this.camera.beta -= Math.PI / 8;
 
-    // Set the target scale to cap the size of the model to .5 meters tall.
-    this.targetScale = this.targetScale / (max.y - min.y);
 
     // Set up an animation loop to show the cube spinning.
     const startTime = Date.now();
@@ -77,7 +79,7 @@ export class SampleScene {
   public reset2D = () => {
     if (this.model && this.scene && this.camera) {
       this.model.setEnabled(true);
-      this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(3));
+      this.model.position = this.camera.position.add(this.camera.getForwardRay().direction.scale(this.targetScale * 5));
       this.model.scalingDeterminant = 0;
       this.camera.setTarget(this.model);
       const startTime = Date.now();
